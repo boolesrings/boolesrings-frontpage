@@ -5,6 +5,7 @@ var Feed = require('feed'); // to creates feed objects and writes them out
 var feedmerger = new require('./feedmerger.js').feedmerger; 
 var escapeMD = new require('./escape-markdown.js').escapeMarkdown; 
 var async = require('async');
+var md = require('markdown-it')();
 
 var theFeeds = [
   'http://boolesrings.org/scoskey/feed/', 
@@ -74,12 +75,14 @@ var theCommentFeed = new Feed({
   }
   });
 
-var theOutput = '---\n' +
-    'layout: page\n' +
-    'title: Booles\' Rings\n' +
-    '---\n\n' // +
-    // '# Booles\' Rings Home\n\n'  // not needed because of jekyll title
-    ;
+//var theOutput = '---\n' +
+//    'layout: page\n' +
+//    'title: Booles\' Rings\n' +
+//    '---\n\n' // +
+//    // '# Booles\' Rings Home\n\n'  // not needed because of jekyll title
+//    ;
+
+var theOutput = "";
 
 var addEntries = function (resultFeed){
 //   console.log(resultFeed.title);
@@ -96,9 +99,11 @@ var addEntries = function (resultFeed){
 var doTheRest = function(results) {
 //   console.log(results.one.render('atom-1.0'));
 //    console.log(results.two.render('atom-1.0'));
-   theOutput += addEntries(results.one);
-   theOutput += addEntries(results.two);
-   fs.writeFile('./boolesrings.org/index.md',theOutput);
+    theOutput += addEntries(results.one);
+    theOutput += addEntries(results.two);
+    theOutput = md.render(theOutput);
+    theOutput = "<html><body>\n" + theOutput + "\n</body></html>";
+    fs.writeFile('./boolesrings.org/index.html',theOutput);
 //   build out markdown now!
   };
 
